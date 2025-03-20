@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: kolpakovee
+      changes:
+        - addColumn:
+            tableName: rules
+            columns:
+              - column:
+                  name: cron_expression
+                  type: VARCHAR(255)
+                  defaultValue: ''
+                  remarks: 'Cron expression for scheduling'
+              - column:
+                  name: time_zone
+                  type: VARCHAR(50)
+                  defaultValue: 'UTC'
+                  remarks: 'Time zone for scheduling'
+      rollback:
+        - dropColumn:
+            tableName: rules
+            columnName: cron_expression
+        - dropColumn:
+            tableName: rules
+            columnName: time_zone

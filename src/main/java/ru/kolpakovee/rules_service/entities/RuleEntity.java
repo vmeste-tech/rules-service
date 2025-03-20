@@ -29,4 +29,9 @@ public class RuleEntity {
     private RuleStatus status;
 
     private double penaltyAmount;
+
+    private String cronExpression;
+
+    @Column(length = 50)
+    private String timeZone;
 }

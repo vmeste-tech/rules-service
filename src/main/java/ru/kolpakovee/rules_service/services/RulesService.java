@@ -19,7 +19,6 @@ import java.util.UUID;
 public class RulesService {
 
     private final RulesRepository rulesRepository;
-
     private final UserServiceClient userServiceClient;
 
     public List<RuleDto> getApartmentRules(UUID apartmentId) {
@@ -32,22 +31,30 @@ public class RulesService {
 
     public RuleDto createRule(CreateRuleRequest request) {
         RuleEntity ruleEntity = new RuleEntity();
-        ruleEntity.setDescription(request.description());
         ruleEntity.setName(request.name());
+        ruleEntity.setDescription(request.description());
         ruleEntity.setPenaltyAmount(request.penaltyAmount());
         ruleEntity.setStatus(RuleStatus.VOTING);
         ruleEntity.setApartmentId(userServiceClient.getApartmentByToken().apartmentId());
+        ruleEntity.setCronExpression(request.cronExpression());
+        ruleEntity.setTimeZone(request.timeZone());
 
-        return RulesMapper.INSTANCE.toDto(
-                rulesRepository.save(ruleEntity)
-        );
+        return RulesMapper.INSTANCE.toDto(rulesRepository.save(ruleEntity));
     }
 
     public RuleDto updateRule(UpdateRuleRequest request) {
-        throw new UnsupportedOperationException();
+        RuleEntity ruleEntity = rulesRepository.findById(request.id())
+                .orElseThrow(() -> new RuntimeException("Rule not found"));
+        ruleEntity.setName(request.name());
+        ruleEntity.setDescription(request.description());
+        ruleEntity.setPenaltyAmount(request.penaltyAmount());
+        ruleEntity.setStatus(request.status());
+        ruleEntity.setCronExpression(request.cronExpression());
+        ruleEntity.setTimeZone(request.timeZone());
+        return RulesMapper.INSTANCE.toDto(rulesRepository.save(ruleEntity));
     }
 
     public void deleteRule(UUID ruleId) {
-        throw new UnsupportedOperationException();
+        rulesRepository.deleteById(ruleId);
     }
 }

@@ -10,6 +10,8 @@ public record RuleDto(
         String name,
         String description,
         RuleStatus status,
-        double penaltyAmount
+        double penaltyAmount,
+        String cronExpression,
+        String timeZone
 ) {
 }
