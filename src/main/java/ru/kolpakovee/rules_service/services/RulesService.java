@@ -22,9 +22,9 @@ public class RulesService {
 
     private final UserServiceClient userServiceClient;
 
-    public List<RuleDto> getApartmentRules() {
+    public List<RuleDto> getApartmentRules(UUID apartmentId) {
         return rulesRepository
-                .findAllByApartmentId(userServiceClient.getApartmentByToken().apartmentId())
+                .findAllByApartmentId(apartmentId)
                 .stream()
                 .map(RulesMapper.INSTANCE::toDto)
                 .toList();
@@ -35,7 +35,7 @@ public class RulesService {
         ruleEntity.setDescription(request.description());
         ruleEntity.setName(request.name());
         ruleEntity.setPenaltyAmount(request.penaltyAmount());
-        ruleEntity.setStatus(RuleStatus.voting);
+        ruleEntity.setStatus(RuleStatus.VOTING);
         ruleEntity.setApartmentId(userServiceClient.getApartmentByToken().apartmentId());
 
         return RulesMapper.INSTANCE.toDto(

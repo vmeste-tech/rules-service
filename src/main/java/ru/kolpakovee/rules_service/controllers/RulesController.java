@@ -19,9 +19,9 @@ public class RulesController {
 
     private final RulesService rulesService;
 
-    @GetMapping
-    public List<RuleDto> getApartmentRules() {
-        return rulesService.getApartmentRules();
+    @GetMapping("/{apartmentId}")
+    public List<RuleDto> getApartmentRules(@PathVariable UUID apartmentId) {
+        return rulesService.getApartmentRules(apartmentId);
     }
 
     @PostMapping
