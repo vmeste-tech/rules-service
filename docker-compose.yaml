@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14
+    container_name: rules_postgres
+    restart: always
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: rules_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - rules_pgdata:/var/lib/postgresql/data
+
+volumes:
+  rules_pgdata:

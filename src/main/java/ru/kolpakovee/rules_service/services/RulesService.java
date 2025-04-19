@@ -6,10 +6,10 @@ import ru.kolpakovee.rules_service.clients.UserServiceClient;
 import ru.kolpakovee.rules_service.entities.RuleEntity;
 import ru.kolpakovee.rules_service.enums.RuleStatus;
 import ru.kolpakovee.rules_service.mappers.RulesMapper;
-import ru.kolpakovee.rules_service.records.CreateRuleRequest;
-import ru.kolpakovee.rules_service.records.RuleDto;
-import ru.kolpakovee.rules_service.records.UpdateRuleRequest;
+import ru.kolpakovee.rules_service.mappers.VoteMapper;
+import ru.kolpakovee.rules_service.records.*;
 import ru.kolpakovee.rules_service.repositories.RulesRepository;
+import ru.kolpakovee.rules_service.repositories.VoteRepository;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,6 +19,7 @@ import java.util.UUID;
 public class RulesService {
 
     private final RulesRepository rulesRepository;
+    private final VoteRepository voteRepository;
     private final UserServiceClient userServiceClient;
 
     public List<RuleDto> getApartmentRules(UUID apartmentId) {
@@ -56,5 +57,32 @@ public class RulesService {
 
     public void deleteRule(UUID ruleId) {
         rulesRepository.deleteById(ruleId);
+    }
+
+    public RuleDto changeStatus(ChangeStatusRequest request) {
+        RuleEntity ruleEntity = rulesRepository.findById(request.ruleId())
+                .orElseThrow(() -> new RuntimeException("Rule not found"));
+
+        ruleEntity.setStatus(request.status());
+        return RulesMapper.INSTANCE.toDto(rulesRepository.save(ruleEntity));
+    }
+
+    public RuleInfo getRule(UUID ruleId) {
+        RuleDto rule = RulesMapper.INSTANCE.toDto(rulesRepository.findById(ruleId)
+                .orElseThrow(() -> new RuntimeException("Rule not found")));
+
+        List<VoteDto> voteResult = voteRepository.findAllById_RuleId(ruleId).stream()
+                .map(VoteMapper.INSTANCE::toDto)
+                .toList();
+
+        return RuleInfo.builder()
+                .id(rule.id())
+                .name(rule.name())
+                .description(rule.description())
+                .penaltyAmount(rule.penaltyAmount())
+                .status(rule.status())
+                .cronExpression(rule.cronExpression())
+                .voteResult(voteResult)
+                .build();
     }
 }

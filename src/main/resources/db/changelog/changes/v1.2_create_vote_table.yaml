@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: 3
+      author: kolpakovee
+      changes:
+        - createTable:
+            tableName: votes
+            columns:
+              - column:
+                  name: user_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: rule_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: vote
+                  type: varchar(10)
+                  constraints:
+                    nullable: false
+
+      rollback:
+        - dropTable:
+            tableName: rules

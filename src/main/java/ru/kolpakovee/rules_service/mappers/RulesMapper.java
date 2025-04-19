@@ -10,6 +10,5 @@ public interface RulesMapper {
 
     RulesMapper INSTANCE = Mappers.getMapper(RulesMapper.class);
 
-
     RuleDto toDto(RuleEntity taskEntity);
 }
