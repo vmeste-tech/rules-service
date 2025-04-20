@@ -1,12 +1,15 @@
 package ru.kolpakovee.rules_service.services;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.kolpakovee.rules_service.clients.UserServiceClient;
+import ru.kolpakovee.rules_service.constants.NotificationMessages;
 import ru.kolpakovee.rules_service.entities.RuleEntity;
 import ru.kolpakovee.rules_service.enums.RuleStatus;
 import ru.kolpakovee.rules_service.mappers.RulesMapper;
 import ru.kolpakovee.rules_service.mappers.VoteMapper;
+import ru.kolpakovee.rules_service.producer.NotificationEventProducer;
 import ru.kolpakovee.rules_service.records.*;
 import ru.kolpakovee.rules_service.repositories.RulesRepository;
 import ru.kolpakovee.rules_service.repositories.VoteRepository;
@@ -22,6 +25,8 @@ public class RulesService {
     private final VoteRepository voteRepository;
     private final UserServiceClient userServiceClient;
 
+    private final NotificationEventProducer producer;
+
     public List<RuleDto> getApartmentRules(UUID apartmentId) {
         return rulesRepository
                 .findAllByApartmentId(apartmentId)
@@ -30,7 +35,8 @@ public class RulesService {
                 .toList();
     }
 
-    public RuleDto createRule(CreateRuleRequest request) {
+    @Transactional
+    public RuleDto createRule(CreateRuleRequest request, UUID userId) {
         RuleEntity ruleEntity = new RuleEntity();
         ruleEntity.setName(request.name());
         ruleEntity.setDescription(request.description());
@@ -40,10 +46,13 @@ public class RulesService {
         ruleEntity.setCronExpression(request.cronExpression());
         ruleEntity.setTimeZone(request.timeZone());
 
+        producer.send(userId, NotificationMessages.CREATE_RULE);
+
         return RulesMapper.INSTANCE.toDto(rulesRepository.save(ruleEntity));
     }
 
-    public RuleDto updateRule(UpdateRuleRequest request) {
+    @Transactional
+    public RuleDto updateRule(UpdateRuleRequest request, UUID userId) {
         RuleEntity ruleEntity = rulesRepository.findById(request.id())
                 .orElseThrow(() -> new RuntimeException("Rule not found"));
         ruleEntity.setName(request.name());
@@ -52,10 +61,15 @@ public class RulesService {
         ruleEntity.setStatus(request.status());
         ruleEntity.setCronExpression(request.cronExpression());
         ruleEntity.setTimeZone(request.timeZone());
+
+        producer.send(userId, NotificationMessages.UPDATE_RULE);
+
         return RulesMapper.INSTANCE.toDto(rulesRepository.save(ruleEntity));
     }
 
-    public void deleteRule(UUID ruleId) {
+    @Transactional
+    public void deleteRule(UUID ruleId, UUID userId) {
+        producer.send(userId, NotificationMessages.DELETE_RULE);
         rulesRepository.deleteById(ruleId);
     }
 

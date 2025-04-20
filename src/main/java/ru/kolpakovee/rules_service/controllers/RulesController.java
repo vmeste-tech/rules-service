@@ -5,12 +5,15 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import ru.kolpakovee.rules_service.records.CreateRuleRequest;
 import ru.kolpakovee.rules_service.records.RuleDto;
 import ru.kolpakovee.rules_service.records.RuleInfo;
 import ru.kolpakovee.rules_service.records.UpdateRuleRequest;
 import ru.kolpakovee.rules_service.services.RulesService;
+import ru.kolpakovee.rules_service.utils.JwtUtils;
 
 import java.util.List;
 import java.util.UUID;
@@ -36,23 +39,23 @@ public class RulesController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Создание правила",
             description = "Позволяет создать новое правило")
-    public RuleDto createRule(@RequestBody CreateRuleRequest request) {
-        return rulesService.createRule(request);
+    public RuleDto createRule(@RequestBody CreateRuleRequest request, @AuthenticationPrincipal Jwt jwt) {
+        return rulesService.createRule(request, JwtUtils.getUserId(jwt));
     }
 
     @PutMapping
     @Operation(summary = "Обновление правила",
             description = "Позволяет обновить существующее правило")
-    public RuleDto updateRule(@RequestBody UpdateRuleRequest request) {
-        return rulesService.updateRule(request);
+    public RuleDto updateRule(@RequestBody UpdateRuleRequest request, @AuthenticationPrincipal Jwt jwt) {
+        return rulesService.updateRule(request, JwtUtils.getUserId(jwt));
     }
 
     @DeleteMapping("/{ruleId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Удаление правила правила",
             description = "Позволяет удалить существующее правило")
-    public void deleteRule(@PathVariable UUID ruleId) {
-        rulesService.deleteRule(ruleId);
+    public void deleteRule(@PathVariable UUID ruleId, @AuthenticationPrincipal Jwt jwt) {
+        rulesService.deleteRule(ruleId, JwtUtils.getUserId(jwt));
     }
 
     @GetMapping("/by-id/{ruleId}")

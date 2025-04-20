@@ -4,11 +4,13 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.kolpakovee.rules_service.clients.UserServiceClient;
+import ru.kolpakovee.rules_service.constants.NotificationMessages;
 import ru.kolpakovee.rules_service.entities.VoteEntity;
 import ru.kolpakovee.rules_service.entities.VoteId;
 import ru.kolpakovee.rules_service.enums.RuleStatus;
 import ru.kolpakovee.rules_service.enums.VoteStatus;
 import ru.kolpakovee.rules_service.mappers.VoteMapper;
+import ru.kolpakovee.rules_service.producer.NotificationEventProducer;
 import ru.kolpakovee.rules_service.records.ApartmentInfo;
 import ru.kolpakovee.rules_service.records.ChangeStatusRequest;
 import ru.kolpakovee.rules_service.records.CreateVoteRequest;
@@ -26,8 +28,12 @@ public class VoteService {
     private final VoteRepository voteRepository;
     private final RulesService rulesService;
 
+    private final NotificationEventProducer producer;
+
     @Transactional
     public VoteDto vote(CreateVoteRequest voteRequest, UUID userId) {
+        producer.send(userId, NotificationMessages.VOTE);
+
         if (voteRequest.status() == VoteStatus.AGAINST) {
             rulesService.changeStatus(ChangeStatusRequest.builder()
                     .ruleId(voteRequest.ruleId())
