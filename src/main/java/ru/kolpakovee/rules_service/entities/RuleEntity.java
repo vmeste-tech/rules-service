@@ -34,4 +34,6 @@ public class RuleEntity {
 
     @Column(length = 50)
     private String timeZone;
+
+    private boolean autoCreateTasks;
 }

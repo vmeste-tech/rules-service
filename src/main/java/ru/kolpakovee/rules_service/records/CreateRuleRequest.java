@@ -13,11 +13,11 @@ public record CreateRuleRequest(
         @PositiveOrZero(message = "Penalty amount must be zero or positive")
         double penaltyAmount,
 
-        @NotBlank(message = "Cron expression must not be blank")
         String cronExpression,
 
-        @NotBlank(message = "Time zone must not be blank")
-        String timeZone
+        String timeZone,
+
+        boolean autoCreateTasks
 ) {
 }
 

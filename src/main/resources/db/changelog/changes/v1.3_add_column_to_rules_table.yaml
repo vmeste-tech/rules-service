@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: 4
+      author: kolpakovee
+      changes:
+        - addColumn:
+            tableName: rules
+            columns:
+              - column:
+                  name: auto_create_tasks
+                  type: boolean
+                  defaultValue: true
+                  constraints:
+                    nullable: false
+                  remarks: "Enables automatic task generation for the rule. Set to false to disable task creation"
+      rollback:
+        - dropColumn:
+            tableName: rules
+            columnName: auto_create_tasks

@@ -12,6 +12,7 @@ public record RuleDto(
         RuleStatus status,
         double penaltyAmount,
         String cronExpression,
-        String timeZone
+        String timeZone,
+        boolean autoCreateTasks
 ) {
 }

@@ -45,6 +45,7 @@ public class RulesService {
         ruleEntity.setApartmentId(userServiceClient.getApartmentByToken().apartmentId());
         ruleEntity.setCronExpression(request.cronExpression());
         ruleEntity.setTimeZone(request.timeZone());
+        ruleEntity.setAutoCreateTasks(request.autoCreateTasks());
 
         producer.send(userId, NotificationMessages.CREATE_RULE);
 
@@ -73,12 +74,12 @@ public class RulesService {
         rulesRepository.deleteById(ruleId);
     }
 
-    public RuleDto changeStatus(ChangeStatusRequest request) {
+    public void changeStatus(ChangeStatusRequest request) {
         RuleEntity ruleEntity = rulesRepository.findById(request.ruleId())
                 .orElseThrow(() -> new RuntimeException("Rule not found"));
 
         ruleEntity.setStatus(request.status());
-        return RulesMapper.INSTANCE.toDto(rulesRepository.save(ruleEntity));
+        RulesMapper.INSTANCE.toDto(rulesRepository.save(ruleEntity));
     }
 
     public RuleInfo getRule(UUID ruleId) {
